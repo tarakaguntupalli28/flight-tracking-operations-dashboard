@@ -42,7 +42,7 @@ body {
   margin: 0;
   background: var(--body-bg);
   color: var(--text);
-  overflow: hidden;
+  overflow: auto;
 }
 
 button,
@@ -59,7 +59,6 @@ button {
   display: grid;
   grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
   min-height: 100vh;
-  height: 100vh;
   background: var(--body-bg);
   color: var(--text);
   transition:
@@ -350,9 +349,8 @@ dd {
   grid-template-rows: auto auto minmax(390px, 1fr) auto auto;
   gap: 0.75rem;
   min-width: 0;
-  height: 100vh;
+  min-height: 100vh;
   padding: 1rem;
-  overflow: hidden;
 }
 
 .map-header {
@@ -483,23 +481,25 @@ dd {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.55rem;
-  max-height: 170px;
-  overflow: auto;
+  overflow: visible;
   padding: 0.65rem;
+  align-content: start;
 }
 
 .flight-row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.3rem 0.65rem;
-  align-items: center;
-  min-height: 66px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  gap: 0.42rem 0.65rem;
+  align-items: start;
+  min-height: 82px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0.62rem;
+  padding: 0.68rem;
   background: var(--row-bg);
   color: var(--text);
   text-align: left;
+  overflow: hidden;
 }
 
 .flight-row:hover,
@@ -508,9 +508,21 @@ dd {
   background: rgba(0, 164, 255, 0.12);
 }
 
+.flight-row.selected {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
 .flight-row strong,
 .flight-row small {
   display: block;
+}
+
+.flight-row strong,
+.flight-row small,
+.flight-row > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .flight-row > span:nth-child(2) {
@@ -520,13 +532,17 @@ dd {
 
 .status-pill {
   grid-column: 1 / -1;
+  align-self: end;
   width: fit-content;
+  max-width: 100%;
   border-radius: 999px;
   padding: 0.25rem 0.5rem;
   background: rgba(0, 164, 255, 0.14);
   color: #8dd8ff;
   font-size: 0.76rem;
   font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .status-pill--delayed {
@@ -559,10 +575,6 @@ dd {
 }
 
 @media (max-width: 1120px) {
-  body {
-    overflow: auto;
-  }
-
   .dashboard-shell {
     grid-template-columns: 1fr;
     height: auto;
@@ -581,10 +593,6 @@ dd {
     height: auto;
     overflow: visible;
     grid-template-rows: auto auto minmax(430px, 60vh) auto auto;
-  }
-
-  .flight-list {
-    max-height: none;
   }
 }
 
