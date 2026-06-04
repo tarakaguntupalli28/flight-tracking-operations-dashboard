@@ -106,7 +106,9 @@ button {
 .details-panel,
 .filter-panel,
 .map-header,
-.flight-list {
+.flight-list,
+.route-summary,
+.app-footer {
   background: rgba(var(--panel-rgb), 0.88);
   border: 1px solid var(--soft-border);
   border-radius: 8px;
@@ -358,6 +360,34 @@ dd {
   font-size: 1.05rem;
 }
 
+.route-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+}
+
+.route-summary strong {
+  display: block;
+  margin-top: 0.24rem;
+  font-size: 1rem;
+}
+
+.route-summary dl {
+  display: flex;
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.route-summary dl div {
+  min-width: 150px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  background: rgba(0, 164, 255, 0.08);
+}
+
 .map-stage {
   min-height: 420px;
   overflow: hidden;
@@ -435,6 +465,15 @@ dd {
   box-shadow: 0 0 0 4px rgba(201, 213, 222, 0.2);
 }
 
+.aircraft-marker--selected span {
+  width: 24px;
+  height: 24px;
+  background: #ff7a1a;
+  box-shadow:
+    0 0 0 5px rgba(255, 122, 26, 0.28),
+    0 0 18px rgba(255, 122, 26, 0.58);
+}
+
 .flight-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
@@ -500,6 +539,19 @@ dd {
   color: #d7e0e7;
 }
 
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--muted);
+}
+
+.app-footer strong {
+  color: var(--text);
+}
+
 @media (max-width: 1120px) {
   .dashboard-shell {
     grid-template-columns: 1fr;
@@ -529,6 +581,17 @@ dd {
 
   .map-workspace {
     grid-template-rows: auto minmax(360px, 56vh) auto;
+  }
+
+  .route-summary,
+  .app-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .route-summary dl {
+    width: 100%;
+    flex-direction: column;
   }
 
   .map-stage,

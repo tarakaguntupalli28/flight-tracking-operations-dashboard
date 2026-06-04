@@ -4,13 +4,18 @@ A responsive Angular 20 operations dashboard for monitoring mock commercial flig
 
 ## Features
 
-- Interactive Leaflet map with 18 mock flights
-- Marker popups with flight number, callsign, origin, destination, and status
-- Route highlighting for the selected flight with origin, current position, and destination
-- Flight details panel with aircraft, schedule, altitude, and speed
-- KPI cards for total, active, delayed, and arrived flights
-- Reactive search and filters for callsign, status, origin, and destination
-- Angular routing, standalone components, service-driven data, RxJS streams, and responsive layout
+- Interactive Flight Monitoring Dashboard
+- Leaflet Map Integration
+- Route Visualization with Polylines
+- Auto-focus on selected flight route bounds
+- Highlighted selected marker
+- Route distance and estimated duration summary
+- Flight Details Panel
+- KPI Dashboard
+- Search by Callsign
+- Filter by Status, Origin and Destination
+- Day/Night Mode
+- Responsive Design
 - SSR-safe Leaflet loading through browser-only dynamic import
 
 ## Tech Stack
@@ -21,6 +26,22 @@ A responsive Angular 20 operations dashboard for monitoring mock commercial flig
 - RxJS
 - Angular Router
 - Leaflet
+- CSS
+
+## Architecture
+
+```text
+Components
+|-- Dashboard
+|-- Flight Map
+|-- Flight Details
+|-- KPI Cards
+|-- Search & Filters
+`-- Flight List
+
+Services
+`-- Flight Service
+```
 
 ## Setup
 

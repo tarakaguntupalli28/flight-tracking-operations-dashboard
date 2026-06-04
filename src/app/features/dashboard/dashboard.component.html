@@ -147,6 +147,27 @@
       </div>
     </div>
 
+    <section
+      *ngIf="selectedFlight && selectedRouteMetrics as route"
+      class="route-summary"
+      aria-label="Selected route information"
+    >
+      <div>
+        <span class="eyebrow">Selected Route</span>
+        <strong>{{ selectedFlight.origin.code }} to {{ selectedFlight.destination.code }}</strong>
+      </div>
+      <dl>
+        <div>
+          <dt>Route Distance</dt>
+          <dd>{{ route.distanceKm | number }} km</dd>
+        </div>
+        <div>
+          <dt>Estimated Duration</dt>
+          <dd>{{ route.duration }}</dd>
+        </div>
+      </dl>
+    </section>
+
     <div class="map-stage">
       <div #mapContainer class="flight-map" role="application" aria-label="Leaflet flight map"></div>
     </div>
@@ -174,5 +195,10 @@
 
       <p *ngIf="flights.length === 0" class="empty-state">No flights match the current filters.</p>
     </div>
+
+    <footer class="app-footer">
+      <strong>Flight Tracking & Operations Dashboard</strong>
+      <span>Built with Angular + Leaflet Maps</span>
+    </footer>
   </section>
 </main>

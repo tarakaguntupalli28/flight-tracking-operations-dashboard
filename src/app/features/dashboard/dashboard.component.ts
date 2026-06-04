@@ -14,6 +14,11 @@ import type * as Leaflet from 'leaflet';
 import { FlightService } from '../../services/flight.service';
 import { Flight, FlightFilters, FlightStatus } from '../../models/flight.model';
 
+interface RouteMetrics {
+  distanceKm: number;
+  duration: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [AsyncPipe, DecimalPipe, NgClass, NgFor, NgIf, ReactiveFormsModule],
@@ -44,6 +49,7 @@ export class DashboardComponent implements AfterViewInit {
   readonly airports$ = this.flightService.airports$;
   readonly statuses = this.flightService.statuses;
   selectedFlight?: Flight;
+  selectedRouteMetrics?: RouteMetrics;
   isNightMode = true;
 
   constructor() {
@@ -57,7 +63,11 @@ export class DashboardComponent implements AfterViewInit {
 
       if (this.selectedFlight && !flights.some((flight) => flight.id === this.selectedFlight?.id)) {
         this.selectedFlight = flights[0];
+        this.selectedRouteMetrics = this.selectedFlight
+          ? this.calculateRouteMetrics(this.selectedFlight)
+          : undefined;
         this.drawSelectedRoute();
+        this.updateMarkerIcons();
       }
     });
   }
@@ -74,7 +84,9 @@ export class DashboardComponent implements AfterViewInit {
 
   selectFlight(flight: Flight): void {
     this.selectedFlight = flight;
+    this.selectedRouteMetrics = this.calculateRouteMetrics(flight);
     this.drawSelectedRoute();
+    this.updateMarkerIcons();
   }
 
   resetFilters(): void {
@@ -132,10 +144,11 @@ export class DashboardComponent implements AfterViewInit {
       if (marker) {
         marker.setLatLng(position);
         marker.setPopupContent(this.popupTemplate(flight));
+        marker.setIcon(this.createAircraftIcon(flight.status, this.selectedFlight?.id === flight.id));
       } else {
         const nextMarker = this.leaflet
           .marker(position, {
-            icon: this.createAircraftIcon(flight.status),
+            icon: this.createAircraftIcon(flight.status, this.selectedFlight?.id === flight.id),
             title: `${flight.callsign} ${flight.origin.code}-${flight.destination.code}`,
           })
           .bindPopup(this.popupTemplate(flight))
@@ -169,31 +182,92 @@ export class DashboardComponent implements AfterViewInit {
       })
       .addTo(this.map);
 
-    this.map.fitBounds(this.routeLine.getBounds(), {
-      padding: [58, 58],
+    const bounds = this.leaflet.latLngBounds(route);
+
+    this.map.fitBounds(bounds, {
+      padding: [50, 50],
       maxZoom: 5,
     });
 
     this.markers.get(this.selectedFlight.id)?.openPopup();
   }
 
-  private createAircraftIcon(status: FlightStatus): Leaflet.DivIcon {
+  private createAircraftIcon(status: FlightStatus, isSelected = false): Leaflet.DivIcon {
     const statusClass = status.toLowerCase();
+    const selectedClass = isSelected ? ' aircraft-marker--selected' : '';
+    const iconSize: [number, number] = isSelected ? [44, 44] : [34, 34];
+    const iconAnchor: [number, number] = isSelected ? [22, 22] : [17, 17];
 
     return this.leaflet!.divIcon({
-      className: `aircraft-marker aircraft-marker--${statusClass}`,
+      className: `aircraft-marker aircraft-marker--${statusClass}${selectedClass}`,
       html: '<span aria-hidden="true"></span>',
-      iconSize: [34, 34],
-      iconAnchor: [17, 17],
+      iconSize,
+      iconAnchor,
       popupAnchor: [0, -18],
     });
   }
 
   private popupTemplate(flight: Flight): string {
+    const metrics = this.calculateRouteMetrics(flight);
+
     return `
       <strong>${flight.flightNumber} - ${flight.callsign}</strong>
       <span>${flight.origin.code} to ${flight.destination.code}</span>
       <span>Status: ${flight.status}</span>
+      <span>Route Distance: ${metrics.distanceKm.toLocaleString()} km</span>
+      <span>Estimated Duration: ${metrics.duration}</span>
     `;
+  }
+
+  private updateMarkerIcons(): void {
+    if (!this.leaflet) {
+      return;
+    }
+
+    for (const flight of this.latestFlights) {
+      this.markers
+        .get(flight.id)
+        ?.setIcon(this.createAircraftIcon(flight.status, this.selectedFlight?.id === flight.id));
+    }
+  }
+
+  private calculateRouteMetrics(flight: Flight): RouteMetrics {
+    const distanceKm = Math.round(
+      this.distanceBetween(
+        flight.origin.lat,
+        flight.origin.lng,
+        flight.destination.lat,
+        flight.destination.lng,
+      ),
+    );
+    const speedKmh = (flight.speedKts > 0 ? flight.speedKts : 450) * 1.852;
+    const totalMinutes = Math.max(1, Math.round((distanceKm / speedKmh) * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return {
+      distanceKm,
+      duration: hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`,
+    };
+  }
+
+  private distanceBetween(originLat: number, originLng: number, destinationLat: number, destinationLng: number): number {
+    const earthRadiusKm = 6371;
+    const latDelta = this.toRadians(destinationLat - originLat);
+    const lngDelta = this.toRadians(destinationLng - originLng);
+    const originLatRad = this.toRadians(originLat);
+    const destinationLatRad = this.toRadians(destinationLat);
+    const haversine =
+      Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+      Math.cos(originLatRad) *
+        Math.cos(destinationLatRad) *
+        Math.sin(lngDelta / 2) *
+        Math.sin(lngDelta / 2);
+
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  }
+
+  private toRadians(value: number): number {
+    return (value * Math.PI) / 180;
   }
 }
