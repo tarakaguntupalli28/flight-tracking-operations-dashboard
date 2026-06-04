@@ -7,7 +7,7 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { AsyncPipe, DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { AsyncPipe, DecimalPipe, NgClass, NgFor, NgIf, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type * as Leaflet from 'leaflet';
@@ -16,7 +16,7 @@ import { Flight, FlightFilters, FlightStatus } from '../../models/flight.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [AsyncPipe, DecimalPipe, ReactiveFormsModule],
+  imports: [AsyncPipe, DecimalPipe, NgClass, NgFor, NgIf, ReactiveFormsModule],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements AfterViewInit {
