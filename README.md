@@ -43,6 +43,22 @@ Services
 `-- Flight Service
 ```
 
+## Dashboard Preview
+
+![Dashboard](docs/screenshots/dashboard-overview.png)
+
+## Route Visualization
+
+![Route](docs/screenshots/route-visualization.png)
+
+## Flight Details
+
+![Flight Details](docs/screenshots/flight-details.png)
+
+## Search & Filters
+
+![Filters](docs/screenshots/filters.png)
+
 ## Setup
 
 Install dependencies:
