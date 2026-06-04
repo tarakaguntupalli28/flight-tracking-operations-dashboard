@@ -1,59 +1,63 @@
-# FlightDashboard
+# Flight Tracking & Operations Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+A responsive Angular 20 operations dashboard for monitoring mock commercial flights on a Leaflet map. The experience is built for aviation operations teams that need quick filtering, route context, and flight status visibility.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- Interactive Leaflet map with 18 mock flights
+- Marker popups with flight number, callsign, origin, destination, and status
+- Route highlighting for the selected flight with origin, current position, and destination
+- Flight details panel with aircraft, schedule, altitude, and speed
+- KPI cards for total, active, delayed, and arrived flights
+- Reactive search and filters for callsign, status, origin, and destination
+- Angular routing, standalone components, service-driven data, RxJS streams, and responsive layout
+- SSR-safe Leaflet loading through browser-only dynamic import
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular 20
+- TypeScript
+- Reactive Forms
+- RxJS
+- Angular Router
+- Leaflet
 
-## Code scaffolding
+## Setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Install dependencies:
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Start the development server:
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+Open:
 
-For end-to-end (e2e) testing, run:
+```text
+http://localhost:4200/
+```
+
+Build for production:
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Run unit tests:
 
-## Additional Resources
+```bash
+npm test
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Project Notes
+
+The npm scripts call Angular CLI through `node ./node_modules/@angular/cli/bin/ng.js`. This avoids a Windows command parsing issue when the project path contains an ampersand, such as `Flight Tracking & Operations Dashboard`.
+
+## Design Explanation
+
+See [DESIGN.md](./DESIGN.md) for the dashboard structure, UX decisions, and implementation notes.

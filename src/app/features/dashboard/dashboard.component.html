@@ -1,0 +1,180 @@
+<main class="dashboard-shell" [class.theme-night]="isNightMode" [class.theme-day]="!isNightMode">
+  <section class="operations-panel" aria-label="Flight operations controls">
+    <div class="brand-block">
+      <span class="eyebrow">Live Operations</span>
+      <h1>Flight Tracking Dashboard</h1>
+      <p>Monitor routes, active aircraft, and operational exceptions from one dispatch view.</p>
+    </div>
+
+    @if (kpis$ | async; as kpis) {
+      <div class="kpi-grid" aria-label="Flight summary">
+        <article class="kpi-card">
+          <span>Total Flights</span>
+          <strong>{{ kpis.total }}</strong>
+        </article>
+        <article class="kpi-card active">
+          <span>Active Flights</span>
+          <strong>{{ kpis.active }}</strong>
+        </article>
+        <article class="kpi-card delayed">
+          <span>Delayed Flights</span>
+          <strong>{{ kpis.delayed }}</strong>
+        </article>
+        <article class="kpi-card arrived">
+          <span>Arrived Flights</span>
+          <strong>{{ kpis.arrived }}</strong>
+        </article>
+      </div>
+    }
+
+    @if (airports$ | async; as airports) {
+      <form class="filter-panel" [formGroup]="filtersForm" aria-label="Flight search and filters">
+        <label>
+          <span>Search Callsign</span>
+          <input type="search" formControlName="callsign" placeholder="AIC187, BAW142..." />
+        </label>
+
+        <div class="filter-row">
+          <label>
+            <span>Status</span>
+            <select formControlName="status">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            <span>Origin</span>
+            <select formControlName="origin">
+              <option value="All">All</option>
+              @for (airport of airports.origins; track airport) {
+                <option [value]="airport">{{ airport }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            <span>Destination</span>
+            <select formControlName="destination">
+              <option value="All">All</option>
+              @for (airport of airports.destinations; track airport) {
+                <option [value]="airport">{{ airport }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <button class="reset-button" type="button" (click)="resetFilters()">Reset Filters</button>
+      </form>
+    }
+
+    <section class="details-panel" aria-label="Selected flight details">
+      <div class="section-heading">
+        <span>Selected Flight</span>
+        @if (selectedFlight) {
+          <strong>{{ selectedFlight.status }}</strong>
+        }
+      </div>
+
+      @if (selectedFlight) {
+        <div class="flight-ident">
+          <h2>{{ selectedFlight.flightNumber }}</h2>
+          <span>{{ selectedFlight.callsign }}</span>
+        </div>
+
+        <dl class="details-grid">
+          <div>
+            <dt>Aircraft Type</dt>
+            <dd>{{ selectedFlight.aircraftType }}</dd>
+          </div>
+          <div>
+            <dt>Origin</dt>
+            <dd>{{ selectedFlight.origin.code }} - {{ selectedFlight.origin.city }}</dd>
+          </div>
+          <div>
+            <dt>Destination</dt>
+            <dd>{{ selectedFlight.destination.code }} - {{ selectedFlight.destination.city }}</dd>
+          </div>
+          <div>
+            <dt>Current Status</dt>
+            <dd>{{ selectedFlight.status }}</dd>
+          </div>
+          <div>
+            <dt>Estimated Departure</dt>
+            <dd>{{ selectedFlight.estimatedDeparture }}</dd>
+          </div>
+          <div>
+            <dt>Estimated Arrival</dt>
+            <dd>{{ selectedFlight.estimatedArrival }}</dd>
+          </div>
+          <div>
+            <dt>Altitude</dt>
+            <dd>{{ selectedFlight.altitudeFt | number }} ft</dd>
+          </div>
+          <div>
+            <dt>Ground Speed</dt>
+            <dd>{{ selectedFlight.speedKts }} kts</dd>
+          </div>
+        </dl>
+      } @else {
+        <p class="empty-state">Select a marker or flight row to view route and aircraft details.</p>
+      }
+    </section>
+  </section>
+
+  <section class="map-workspace" aria-label="Interactive flight map">
+    <div class="map-header">
+      <div>
+        <span class="eyebrow">Airspace Monitor</span>
+        <h2>Asia, Middle East, Europe and long-haul corridors</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          class="theme-toggle"
+          type="button"
+          [attr.aria-pressed]="!isNightMode"
+          [attr.aria-label]="isNightMode ? 'Switch to day mode' : 'Switch to night mode'"
+          (click)="toggleTheme()"
+        >
+          <span class="toggle-track" aria-hidden="true">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span>{{ isNightMode ? 'Night Mode' : 'Day Mode' }}</span>
+        </button>
+
+        @if (flights$ | async; as flights) {
+          <span class="visible-count">{{ flights.length }} visible</span>
+        }
+      </div>
+    </div>
+
+    <div class="map-stage">
+      <div #mapContainer class="flight-map" role="application" aria-label="Leaflet flight map"></div>
+    </div>
+
+    @if (flights$ | async; as flights) {
+      <div class="flight-list" aria-label="Filtered flights">
+        @for (flight of flights; track trackFlight($index, flight)) {
+          <button
+            type="button"
+            class="flight-row"
+            [class.selected]="selectedFlight?.id === flight.id"
+            (click)="selectFlight(flight)"
+          >
+            <span>
+              <strong>{{ flight.flightNumber }}</strong>
+              <small>{{ flight.callsign }}</small>
+            </span>
+            <span>{{ flight.origin.code }} to {{ flight.destination.code }}</span>
+            <span class="status-pill" [class]="'status-pill status-pill--' + flight.status.toLowerCase()">
+              {{ flight.status }}
+            </span>
+          </button>
+        } @empty {
+          <p class="empty-state">No flights match the current filters.</p>
+        }
+      </div>
+    }
+  </section>
+</main>

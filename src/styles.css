@@ -1,1 +1,538 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1117;
+  --panel: #111a22;
+  --panel-strong: #17232d;
+  --line: #263847;
+  --text: #eef5f8;
+  --muted: #9fb0bd;
+  --accent: #00a4ff;
+  --accent-2: #31d0aa;
+  --warning: #f6b84b;
+  --success: #66d174;
+  --danger: #ff6d70;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  --panel-rgb: 17, 26, 34;
+  --shell-rgb: 13, 22, 30;
+  --field-bg: #0c141b;
+  --map-bg: #071018;
+  --soft-border: rgba(255, 255, 255, 0.08);
+  --subtle-line: rgba(255, 255, 255, 0.07);
+  --button-bg: rgba(0, 164, 255, 0.12);
+  --row-bg: rgba(12, 20, 27, 0.88);
+  --body-bg:
+    radial-gradient(circle at 20% 10%, rgba(0, 164, 255, 0.16), transparent 26rem),
+    linear-gradient(135deg, #091018 0%, #0b1117 45%, #101720 100%);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--body-bg);
+  color: var(--text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--body-bg);
+  color: var(--text);
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.dashboard-shell.theme-day {
+  color-scheme: light;
+  --bg: #eef5f8;
+  --panel: #ffffff;
+  --panel-strong: #edf6fb;
+  --line: #c7d8e2;
+  --text: #10202b;
+  --muted: #536879;
+  --accent: #0079be;
+  --accent-2: #168c70;
+  --warning: #b56d00;
+  --success: #217b38;
+  --danger: #c7343a;
+  --shadow: 0 14px 32px rgba(20, 48, 66, 0.14);
+  --panel-rgb: 255, 255, 255;
+  --shell-rgb: 238, 245, 248;
+  --field-bg: #f8fcff;
+  --map-bg: #d8ecf4;
+  --soft-border: rgba(16, 32, 43, 0.12);
+  --subtle-line: rgba(16, 32, 43, 0.1);
+  --button-bg: rgba(0, 121, 190, 0.1);
+  --row-bg: rgba(255, 255, 255, 0.92);
+  --body-bg:
+    radial-gradient(circle at 18% 8%, rgba(0, 121, 190, 0.12), transparent 24rem),
+    linear-gradient(135deg, #f6fbfe 0%, #eef5f8 48%, #e7f0f5 100%);
+}
+
+.operations-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.2rem;
+  border-right: 1px solid var(--line);
+  background: rgba(var(--shell-rgb), 0.94);
+  overflow: auto;
+}
+
+.brand-block,
+.details-panel,
+.filter-panel,
+.map-header,
+.flight-list {
+  background: rgba(var(--panel-rgb), 0.88);
+  border: 1px solid var(--soft-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.brand-block {
+  padding: 1rem;
+}
+
+.eyebrow,
+.section-heading span,
+label span,
+.kpi-card span,
+dt,
+.visible-count,
+small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  margin-top: 0.35rem;
+  font-size: clamp(1.8rem, 3vw, 2.45rem);
+  line-height: 1.04;
+}
+
+.brand-block p {
+  margin-top: 0.7rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.kpi-card {
+  min-height: 96px;
+  padding: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.kpi-card strong {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: 2rem;
+}
+
+.kpi-card.active {
+  border-color: rgba(0, 164, 255, 0.55);
+}
+
+.kpi-card.delayed {
+  border-color: rgba(246, 184, 75, 0.55);
+}
+
+.kpi-card.arrived {
+  border-color: rgba(102, 209, 116, 0.55);
+}
+
+.filter-panel,
+.details-panel {
+  padding: 1rem;
+}
+
+.filter-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.55rem 0.7rem;
+  background: var(--field-bg);
+  color: var(--text);
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 164, 255, 0.18);
+}
+
+.reset-button {
+  min-height: 42px;
+  border: 1px solid rgba(0, 164, 255, 0.42);
+  border-radius: 6px;
+  background: var(--button-bg);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.section-heading,
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem 0.28rem 0.32rem;
+  background: rgba(var(--panel-rgb), 0.82);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid rgba(0, 164, 255, 0.28);
+  outline-offset: 2px;
+}
+
+.toggle-track {
+  display: inline-flex;
+  align-items: center;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  padding: 3px;
+  background: #182631;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.toggle-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #c8d8e2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.theme-day .toggle-track {
+  background: #d8edf8;
+}
+
+.theme-day .toggle-thumb {
+  transform: translateX(20px);
+  background: #ffb84d;
+}
+
+.section-heading strong,
+.visible-count {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.flight-ident {
+  margin-top: 1rem;
+}
+
+.flight-ident h2 {
+  font-size: 1.7rem;
+}
+
+.flight-ident span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.details-grid {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem 0 0;
+}
+
+.details-grid div {
+  display: grid;
+  gap: 0.18rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--subtle-line);
+}
+
+dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 650;
+}
+
+.empty-state {
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.map-workspace {
+  display: grid;
+  grid-template-rows: auto minmax(420px, 1fr) auto;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.2rem;
+}
+
+.map-header {
+  padding: 0.9rem 1rem;
+}
+
+.map-header h2 {
+  margin-top: 0.28rem;
+  font-size: 1.05rem;
+}
+
+.map-stage {
+  min-height: 420px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--map-bg);
+  box-shadow: var(--shadow);
+}
+
+.flight-map {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+}
+
+.leaflet-container {
+  background: var(--map-bg);
+  font-family: inherit;
+}
+
+.theme-night .leaflet-tile {
+  filter: brightness(0.72) contrast(1.16) saturate(0.78) hue-rotate(178deg);
+}
+
+.theme-day .leaflet-tile {
+  filter: saturate(1.04) contrast(1.02);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.leaflet-popup-content {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 170px;
+  margin: 0.7rem 0.85rem;
+}
+
+.leaflet-popup-content span {
+  color: var(--muted);
+}
+
+.aircraft-marker {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 164, 255, 0.18);
+}
+
+.aircraft-marker span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--map-bg);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0, 164, 255, 0.24);
+}
+
+.aircraft-marker--delayed span {
+  background: var(--warning);
+  box-shadow: 0 0 0 4px rgba(246, 184, 75, 0.25);
+}
+
+.aircraft-marker--arrived span {
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(102, 209, 116, 0.25);
+}
+
+.aircraft-marker--scheduled span {
+  background: #c9d5de;
+  box-shadow: 0 0 0 4px rgba(201, 213, 222, 0.2);
+}
+
+.flight-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+  gap: 0.65rem;
+  max-height: 240px;
+  overflow: auto;
+  padding: 0.75rem;
+}
+
+.flight-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.7rem;
+  background: var(--row-bg);
+  color: var(--text);
+  text-align: left;
+}
+
+.flight-row:hover,
+.flight-row.selected {
+  border-color: var(--accent);
+  background: rgba(0, 164, 255, 0.12);
+}
+
+.flight-row strong,
+.flight-row small {
+  display: block;
+}
+
+.flight-row > span:nth-child(2) {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.status-pill {
+  grid-column: 1 / -1;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 164, 255, 0.14);
+  color: #8dd8ff;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.status-pill--delayed {
+  background: rgba(246, 184, 75, 0.16);
+  color: #ffd98c;
+}
+
+.status-pill--arrived {
+  background: rgba(102, 209, 116, 0.16);
+  color: #a9efb1;
+}
+
+.status-pill--scheduled {
+  background: rgba(201, 213, 222, 0.13);
+  color: #d7e0e7;
+}
+
+@media (max-width: 1120px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .operations-panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .operations-panel,
+  .map-workspace {
+    padding: 0.85rem;
+  }
+
+  .filter-row,
+  .details-grid,
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-workspace {
+    grid-template-rows: auto minmax(360px, 56vh) auto;
+  }
+
+  .map-stage,
+  .flight-map {
+    min-height: 360px;
+  }
+}
