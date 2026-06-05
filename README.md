@@ -6,7 +6,8 @@ A responsive Angular 20 operations dashboard for monitoring mock commercial flig
 
 - Interactive Flight Monitoring Dashboard
 - Leaflet Map Integration
-- Route Visualization with Polylines
+- Route Visualization with dotted point-to-point polylines
+- Dedicated Origin and Destination route markers with airport popups
 - Auto-focus on selected flight route bounds
 - Highlighted selected marker
 - Route distance and estimated duration summary
@@ -45,17 +46,25 @@ Services
 
 ## Dashboard Preview
 
+Current overview of the operations dashboard with KPIs, filters, map, and flight cards.
+
 ![Dashboard](docs/screenshots/dashboard-overview.png)
 
 ## Route Visualization
+
+Selected route view with dedicated origin and destination markers connected by a dotted route line.
 
 ![Route](docs/screenshots/route-visualization.png)
 
 ## Flight Details
 
+Selected flight details panel with map route context and current aircraft position.
+
 ![Flight Details](docs/screenshots/flight-details.png)
 
 ## Search & Filters
+
+Filtered dashboard state showing selected status, origin, and destination filters.
 
 ![Filters](docs/screenshots/filters.png)
 
