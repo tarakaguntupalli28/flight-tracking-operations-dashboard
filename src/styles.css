@@ -437,6 +437,78 @@ dd {
   color: var(--muted);
 }
 
+.route-endpoint-marker {
+  display: grid;
+  justify-items: center;
+  color: #ffffff;
+}
+
+.route-endpoint-marker__pin {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--map-bg);
+  border-radius: 50% 50% 50% 8px;
+  transform: rotate(-45deg);
+  box-shadow:
+    0 0 0 4px rgba(0, 0, 0, 0.2),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.route-endpoint-marker__pin span {
+  transform: rotate(45deg);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.route-endpoint-marker__code {
+  min-width: 38px;
+  margin-top: 0.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.12rem 0.35rem;
+  background: rgba(var(--panel-rgb), 0.9);
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.route-endpoint-marker--origin .route-endpoint-marker__pin {
+  background: var(--accent-2);
+}
+
+.route-endpoint-marker--destination .route-endpoint-marker__pin {
+  background: var(--warning);
+}
+
+.route-endpoint-tooltip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.45rem;
+  background: rgba(var(--panel-rgb), 0.94);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.route-endpoint-tooltip::before {
+  border-top-color: rgba(var(--panel-rgb), 0.94);
+}
+
+.route-endpoint-tooltip--origin {
+  color: #9ff2da;
+}
+
+.route-endpoint-tooltip--destination {
+  color: #ffe0a0;
+}
+
 .aircraft-marker {
   display: grid;
   place-items: center;
@@ -471,10 +543,10 @@ dd {
 .aircraft-marker--selected span {
   width: 24px;
   height: 24px;
-  background: #ff7a1a;
   box-shadow:
-    0 0 0 5px rgba(255, 122, 26, 0.28),
-    0 0 18px rgba(255, 122, 26, 0.58);
+    0 0 0 3px var(--map-bg),
+    0 0 0 7px rgba(0, 164, 255, 0.28),
+    0 0 18px rgba(0, 164, 255, 0.5);
 }
 
 .flight-list {

@@ -12,7 +12,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type * as Leaflet from 'leaflet';
 import { FlightService } from '../../services/flight.service';
-import { Flight, FlightFilters, FlightStatus } from '../../models/flight.model';
+import { Airport, Flight, FlightFilters, FlightStatus } from '../../models/flight.model';
 
 interface RouteMetrics {
   distanceKm: number;
@@ -34,6 +34,7 @@ export class DashboardComponent implements AfterViewInit {
   private leaflet?: typeof Leaflet;
   private map?: Leaflet.Map;
   private routeLine?: Leaflet.Polyline;
+  private routeEndpointMarkers: Leaflet.Marker[] = [];
   private readonly markers = new Map<number, Leaflet.Marker>();
   private latestFlights: Flight[] = [];
 
@@ -161,28 +162,44 @@ export class DashboardComponent implements AfterViewInit {
   }
 
   private drawSelectedRoute(): void {
+    if (this.routeLine && this.map) {
+      this.routeLine.removeFrom(this.map);
+    }
+
+    this.routeLine = undefined;
+    this.clearRouteEndpointMarkers();
+
     if (!this.leaflet || !this.map || !this.selectedFlight) {
       return;
     }
 
-    this.routeLine?.removeFrom(this.map);
-
-    const route: Leaflet.LatLngExpression[] = [
+    const routeLine: Leaflet.LatLngExpression[] = [
+      [this.selectedFlight.origin.lat, this.selectedFlight.origin.lng],
+      [this.selectedFlight.destination.lat, this.selectedFlight.destination.lng],
+    ];
+    const routeBounds: Leaflet.LatLngExpression[] = [
       [this.selectedFlight.origin.lat, this.selectedFlight.origin.lng],
       [this.selectedFlight.currentPosition.lat, this.selectedFlight.currentPosition.lng],
       [this.selectedFlight.destination.lat, this.selectedFlight.destination.lng],
     ];
 
     this.routeLine = this.leaflet
-      .polyline(route, {
+      .polyline(routeLine, {
         color: '#00a4ff',
         weight: 4,
-        opacity: 0.92,
+        opacity: 0.96,
         dashArray: '8 10',
+        lineCap: 'round',
+        lineJoin: 'round',
       })
       .addTo(this.map);
 
-    const bounds = this.leaflet.latLngBounds(route);
+    this.routeEndpointMarkers = [
+      this.createRouteEndpointMarker(this.selectedFlight.origin, 'origin'),
+      this.createRouteEndpointMarker(this.selectedFlight.destination, 'destination'),
+    ];
+
+    const bounds = this.leaflet.latLngBounds(routeBounds);
 
     this.map.fitBounds(bounds, {
       padding: [50, 50],
@@ -207,6 +224,44 @@ export class DashboardComponent implements AfterViewInit {
     });
   }
 
+  private createRouteEndpointMarker(airport: Airport, type: 'origin' | 'destination'): Leaflet.Marker {
+    const indicator = type === 'origin' ? 'Origin' : 'Destination';
+    const position: Leaflet.LatLngExpression = [airport.lat, airport.lng];
+
+    return this.leaflet!
+      .marker(position, {
+        icon: this.createRouteEndpointIcon(type, airport.code),
+        title: `${indicator}: ${airport.code}`,
+        zIndexOffset: 650,
+      })
+      .bindTooltip(`${indicator}: ${airport.code}`, {
+        className: `route-endpoint-tooltip route-endpoint-tooltip--${type}`,
+        direction: 'top',
+        offset: [0, -16],
+        permanent: true,
+      })
+      .bindPopup(this.airportPopupTemplate(airport, indicator))
+      .addTo(this.map!);
+  }
+
+  private createRouteEndpointIcon(type: 'origin' | 'destination', code: string): Leaflet.DivIcon {
+    const shortCode = code.slice(0, 3).toUpperCase();
+
+    return this.leaflet!.divIcon({
+      className: `route-endpoint-marker route-endpoint-marker--${type}`,
+      html: `
+        <span class="route-endpoint-marker__pin" aria-hidden="true">
+          <span>${type === 'origin' ? 'O' : 'D'}</span>
+        </span>
+        <span class="route-endpoint-marker__code">${shortCode}</span>
+      `,
+      iconSize: [44, 54],
+      iconAnchor: [22, 44],
+      popupAnchor: [0, -42],
+      tooltipAnchor: [0, -38],
+    });
+  }
+
   private popupTemplate(flight: Flight): string {
     const metrics = this.calculateRouteMetrics(flight);
 
@@ -217,6 +272,28 @@ export class DashboardComponent implements AfterViewInit {
       <span>Route Distance: ${metrics.distanceKm.toLocaleString()} km</span>
       <span>Estimated Duration: ${metrics.duration}</span>
     `;
+  }
+
+  private airportPopupTemplate(airport: Airport, indicator: string): string {
+    return `
+      <strong>${indicator}: ${airport.code}</strong>
+      <span>Airport Code: ${airport.code}</span>
+      <span>Airport Name: ${airport.name || 'Not available'}</span>
+      <span>City: ${airport.city}</span>
+    `;
+  }
+
+  private clearRouteEndpointMarkers(): void {
+    if (!this.map) {
+      this.routeEndpointMarkers = [];
+      return;
+    }
+
+    for (const marker of this.routeEndpointMarkers) {
+      marker.removeFrom(this.map);
+    }
+
+    this.routeEndpointMarkers = [];
   }
 
   private updateMarkerIcons(): void {
